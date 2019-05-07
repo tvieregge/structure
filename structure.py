@@ -1,8 +1,10 @@
+import random
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from mpl_toolkits.mplot3d import Axes3D
+from itertools import chain
 
 FORCE_CONST = 0.01
 
@@ -16,16 +18,6 @@ class Edge:
     def __init__(self, p1, p2):
         self.p1 = p1
         self.p2 = p2
-
-g_points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0), Point(0.0,0.0,0.0)]
-g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2]), Edge(g_points[3], g_points[0]), Edge(g_points[3], g_points[1]), Edge(g_points[3], g_points[2])]
-# g_points = [Point(10.0,10.0,10.0), Point(30.0,10.0,10.0)]
-# g_edges = [Edge(g_points[0],g_points[1])]
-
-fig = plt.figure()
-ax = Axes3D(fig, xlim=(0,3), ylim=(0,3), zlim=(0,3))
-# lines = sum([ax.plot([], [], [], '-', c=c) for c in colors], [])
-lines = sum([ax.plot([],[],[], lw=2) for e in g_edges], [])
 
 
 def init():
@@ -61,14 +53,14 @@ def calc_forces(edges, points):
 
 
 def apply_forces(points):
-    print('----')
+    # print('----')
     for p in points:
-        print(p.l)
-        print(p.force)
-        print('**')
+        # print(p.l)
+        # print(p.force)
+        # print('**')
         p.l += FORCE_CONST * p.force
-        print(p.l)
-        print('****')
+        # print(p.l)
+        # print('****')
 
 
 def calc_dist(p1, p2):
@@ -90,11 +82,35 @@ def calc_attraction(edge):
     return dist * unit
 
 
-# def parse_points(lines):
-#     return [(e.split()[0], e.split()[1]) for e in lines]
+def parse_points(lines):
+    return [(int(e.split()[0]), int(e.split()[1])) for e in lines]
 
 
 if __name__ == '__main__':
+    with open('data') as f:
+        content = f.readlines()
+        edges = parse_points(content)
+        points = list(set(chain.from_iterable(edges))) # Flatten list of edges and take unique points
+        points.sort()
+        print(edges)
+        print(points)
+
+        g_points = []
+        for p in points:
+            x = random.uniform(0,10)
+            y = random.uniform(0,10)
+            z = random.uniform(0,10)
+            g_points.append(Point(x,y,z))
+
+        g_edges = []
+        for e in edges:
+            g_edges.append(Edge(g_points[e[0]], g_points[e[1]]))
+        # g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2]), Edge(g_points[3], g_points[0]), Edge(g_points[3], g_points[1]), Edge(g_points[3], g_points[2])]
+
+    fig = plt.figure()
+    ax = Axes3D(fig, xlim=(0,10), ylim=(0,10), zlim=(0,10))
+    lines = sum([ax.plot([],[],[], lw=2) for e in g_edges], [])
+
     anim = animation.FuncAnimation(fig, animate, init_func=init,
                                frames=5, interval=20, blit=False)
     plt.show()
