@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 from mpl_toolkits.mplot3d import Axes3D
 
+FORCE_CONST = 0.05
+
 class Point:
     def __init__(self, x, y, z):
         self.l = np.array([x,y,z])
@@ -15,28 +17,34 @@ class Edge:
         self.p1 = p1
         self.p2 = p2
 
-fig = plt.figure()
-ax = Axes3D(fig, xlim=(0,5), ylim=(0,5), zlim=(0,5))
-line, = ax.plot([1,2],[3,4], lw=2)
+g_points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0)]
+g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2])]
+# g_points = [Point(10.0,10.0,10.0), Point(30.0,10.0,10.0)]
+# g_edges = [Edge(g_points[0],g_points[1])]
 
-# g_points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0)]
-# g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2])]
-g_points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0)]
-g_edges = [Edge(g_points[0],g_points[1])]
+fig = plt.figure()
+ax = Axes3D(fig, xlim=(0,3), ylim=(0,3), zlim=(0,3))
+# lines = sum([ax.plot([], [], [], '-', c=c) for c in colors], [])
+lines = sum([ax.plot([],[],[], lw=2) for e in g_edges], [])
+print(lines)
 
 
 def init():
-    line.set_data([g_edges[0].p1.l[0], g_edges[0].p2.l[0]], [g_edges[0].p1.l[1], g_edges[0].p2.l[1]])
-    line.set_3d_properties([g_edges[0].p1.l[2], g_edges[0].p2.l[2]])
-    return line,
+    for line in lines:
+        line.set_data([], [])
+        line.set_3d_properties([])
+    return lines
 
 def animate(i):
+    for p in enumerate(lines):
+        edge, line = p
+        line.set_data([g_edges[edge].p1.l[0], g_edges[edge].p2.l[0]], [g_edges[edge].p1.l[1], g_edges[edge].p2.l[1]])
+        line.set_3d_properties([g_edges[edge].p1.l[2], g_edges[edge].p2.l[2]])
+
     calc_forces(g_edges, g_points)
     apply_forces(g_points)
 
-    line.set_data([g_edges[0].p1.l[0], g_edges[0].p2.l[0]], [g_edges[0].p1.l[1], g_edges[0].p2.l[1]])
-    line.set_3d_properties([g_edges[0].p1.l[2], g_edges[0].p2.l[2]])
-    return line,
+    return lines
 
 
 # def start(fname):
@@ -80,21 +88,23 @@ def calc_forces(edges, points):
             if p == other_p:
                 continue
             p.force = calc_repulsion(p, other_p)
-            print(p.force)
-    print('--')
 
     for e in edges:
         attraction = calc_attraction(e)
         e.p1.force -= attraction
         e.p2.force += attraction
-        print(e.p1.force)
-        print(e.p2.force)
-    print('----')
 
 
 def apply_forces(points):
+    print('----')
     for p in points:
-        p.l += (0.2) * p.force
+        print(p.l)
+        print(p.force)
+        print('**')
+        p.l += FORCE_CONST * p.force
+        print(p.l)
+        print('****')
+
 
 def calc_dist(p1, p2):
     diff = p1.l - p2.l
@@ -115,11 +125,11 @@ def calc_attraction(edge):
     return dist * unit
 
 
-def parse_points(lines):
-    return [(e.split()[0], e.split()[1]) for e in lines]
+# def parse_points(lines):
+#     return [(e.split()[0], e.split()[1]) for e in lines]
 
 
 if __name__ == '__main__':
     anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=5, interval=1000, blit=False)
+                               frames=5, interval=500, blit=False)
     plt.show()
