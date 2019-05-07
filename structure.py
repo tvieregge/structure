@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 from mpl_toolkits.mplot3d import Axes3D
 
-FORCE_CONST = 0.05
+FORCE_CONST = 0.01
 
 class Point:
     def __init__(self, x, y, z):
@@ -17,8 +17,8 @@ class Edge:
         self.p1 = p1
         self.p2 = p2
 
-g_points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0)]
-g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2])]
+g_points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0), Point(0.0,0.0,0.0)]
+g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2]), Edge(g_points[3], g_points[0]), Edge(g_points[3], g_points[1]), Edge(g_points[3], g_points[2])]
 # g_points = [Point(10.0,10.0,10.0), Point(30.0,10.0,10.0)]
 # g_edges = [Edge(g_points[0],g_points[1])]
 
@@ -96,5 +96,5 @@ def calc_attraction(edge):
 
 if __name__ == '__main__':
     anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=5, interval=500, blit=False)
+                               frames=5, interval=20, blit=False)
     plt.show()
