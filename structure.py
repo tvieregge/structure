@@ -28,6 +28,9 @@ def start(fname):
         fig = plt.figure()
         ax = fig.gca(projection='3d')
 
+        for e in edges:
+            ax.plot([e.p1.x, e.p2.x], [e.p1.y, e.p2.y], [e.p1.z+1, e.p2.z+1])
+
         calc_forces(edges, points)
         apply_forces(points)
 
@@ -54,7 +57,8 @@ def calc_forces(edges, points):
         print(e.p2.force)
 
 def apply_forces(points):
-    pass
+    for p in points:
+        p.x += p.force
 
 def calc_dist(p1, p2):
     return math.hypot(p1.x - p2.x, p1.y - p2.y)
