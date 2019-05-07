@@ -1,6 +1,7 @@
 import math
 import numpy as n
 import matplotlib.pyplot as plt
+from matplotlib import animation
 from mpl_toolkits.mplot3d import Axes3D
 
 class Point:
@@ -15,40 +16,26 @@ class Edge:
         self.p2 = p2
 
 
-def start(fname):
-    with open(fname) as f:
-        content = f.readlines()
-        edges = parse_points(content)
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+# for e in edges:
+line, = ax.plot([],[])
+g_points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0)]
+g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2])]
 
-        points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0)]
-        edges = [Edge(points[0],points[1]), Edge(points[0], points[2]), Edge(points[1], points[2])]
 
-        fig = plt.figure()
-        ax = fig.gca(projection='3d')
+def init():
+    line.set_data([], [])
+    return line,
 
-        for e in edges:
-            ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2]+1, e.p2.l[2]+1])
-
-        calc_forces(edges, points)
-        apply_forces(points)
-
-        for e in edges:
-            ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2], e.p2.l[2]])
-
-        calc_forces(edges, points)
-        apply_forces(points)
-
-        for e in edges:
-            ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2]+2, e.p2.l[2]+2])
-
-        calc_forces(edges, points)
-        apply_forces(points)
-
-        for e in edges:
-            ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2]+3, e.p2.l[2]+3])
-
-        plt.show()
-
+def animate(data):
+    calc_forces(g_edges, g_points)
+    apply_forces(g_points)
+    print([g_edges[0].p1.l[0], g_edges[0].p2.l[0]])
+    print([g_edges[0].p1.l[1], g_edges[0].p2.l[1]])
+    # line.set_data([g_edges[0].p1.l[0], g_edges[0].p2.l[0]], [g_edges[0].p1.l[1], g_edges[0].p2.l[1]])
+    line.set_data([1,2],[3,10])
+    return line,
 
 def calc_forces(edges, points):
     for p in points:
@@ -56,15 +43,15 @@ def calc_forces(edges, points):
             if p == other_p:
                 continue
             p.force = calc_repulsion(p, other_p)
-            print(p.force)
-    print('--')
+            # print(p.force)
+    # print('--')
 
     for e in edges:
         attraction = calc_attraction(e)
         e.p1.force -= attraction
         e.p2.force += attraction
-        print(e.p1.force)
-        print(e.p2.force)
+        # print(e.p1.force)
+        # print(e.p2.force)
     print('----')
 
 def apply_forces(points):
@@ -93,7 +80,7 @@ def calc_attraction(edge):
 def parse_points(lines):
     return [(e.split()[0], e.split()[1]) for e in lines]
 
-
 if __name__ == '__main__':
-    fname = 'data'
-    start(fname)
+    anim = animation.FuncAnimation(fig, animate, init_func=init,
+                               frames=5, interval=2000, blit=False)
+    plt.show()
