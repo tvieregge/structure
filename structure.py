@@ -29,56 +29,11 @@ def init():
     return line,
 
 def animate(data):
-    calc_forces(g_edges, g_points)
-    apply_forces(g_points)
     print([g_edges[0].p1.l[0], g_edges[0].p2.l[0]])
     print([g_edges[0].p1.l[1], g_edges[0].p2.l[1]])
     # line.set_data([g_edges[0].p1.l[0], g_edges[0].p2.l[0]], [g_edges[0].p1.l[1], g_edges[0].p2.l[1]])
     line.set_data([1,2],[3,10])
     return line,
-
-def calc_forces(edges, points):
-    for p in points:
-        for other_p in points:
-            if p == other_p:
-                continue
-            p.force = calc_repulsion(p, other_p)
-            # print(p.force)
-    # print('--')
-
-    for e in edges:
-        attraction = calc_attraction(e)
-        e.p1.force -= attraction
-        e.p2.force += attraction
-        # print(e.p1.force)
-        # print(e.p2.force)
-    print('----')
-
-def apply_forces(points):
-    for p in points:
-        p.l += (0.2) * p.force
-
-def calc_dist(p1, p2):
-    diff = p1.l - p2.l
-    return (diff**2).sum()**0.5
-
-
-def calc_repulsion(p1, p2):
-    dist = calc_dist(p1, p2)
-    unit = ((p1.l-p2.l)/dist)
-    return  unit/(dist**2)
-
-
-def calc_attraction(edge):
-    p1 = edge.p1
-    p2 = edge.p2
-    dist = calc_dist(p1, p2)
-    unit = ((p1.l-p2.l)/dist)
-    return dist * unit
-
-
-def parse_points(lines):
-    return [(e.split()[0], e.split()[1]) for e in lines]
 
 if __name__ == '__main__':
     anim = animation.FuncAnimation(fig, animate, init_func=init,
