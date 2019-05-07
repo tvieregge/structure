@@ -6,7 +6,7 @@ from matplotlib import animation
 from mpl_toolkits.mplot3d import Axes3D
 from itertools import chain
 
-FORCE_CONST = 0.01
+FORCE_CONST = 0.05
 
 class Point:
     def __init__(self, x, y, z):
@@ -92,14 +92,12 @@ if __name__ == '__main__':
         edges = parse_points(content)
         points = list(set(chain.from_iterable(edges))) # Flatten list of edges and take unique points
         points.sort()
-        print(edges)
-        print(points)
 
         g_points = []
         for p in points:
-            x = random.uniform(0,10)
-            y = random.uniform(0,10)
-            z = random.uniform(0,10)
+            x = random.uniform(0,5)+2.5
+            y = random.uniform(0,5)+2.5
+            z = random.uniform(0,5)+2.5
             g_points.append(Point(x,y,z))
 
         g_edges = []
@@ -112,5 +110,6 @@ if __name__ == '__main__':
     lines = sum([ax.plot([],[],[], lw=2) for e in g_edges], [])
 
     anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=5, interval=20, blit=False)
+                               frames=150, interval=20, blit=True)
+    # anim.save('cube_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'], dpi=200)
     plt.show()
