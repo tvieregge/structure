@@ -71,7 +71,7 @@ def calc_dist(p1, p2):
 def calc_repulsion(p1, p2):
     dist = calc_dist(p1, p2)
     unit = ((p1.l-p2.l)/dist)
-    return  unit/(dist**2)
+    return  unit/(dist**1.5)
 
 
 def calc_attraction(edge):
@@ -89,27 +89,42 @@ def parse_points(lines):
 if __name__ == '__main__':
     with open('data') as f:
         content = f.readlines()
-        edges = parse_points(content)
-        points = list(set(chain.from_iterable(edges))) # Flatten list of edges and take unique points
-        points.sort()
 
-        g_points = []
-        for p in points:
-            x = random.uniform(0,5)+2.5
-            y = random.uniform(0,5)+2.5
-            z = random.uniform(0,5)+2.5
-            g_points.append(Point(x,y,z))
+    # edges = parse_points(content)
+    # num_edges = len(edges)
+    edges = []
+    num_edges = 30
+    points_for_edges = random.sample(range(num_edges), num_edges)
+    points_for_edges.extend(random.sample(range(num_edges), num_edges))
+    points_for_edges.extend(random.sample(range(num_edges), num_edges))
+    points_for_edges.extend(random.sample(range(num_edges), num_edges))
+    for i in range(len(points_for_edges)//2):
+        p1 = points_for_edges.pop()
+        p2 = points_for_edges.pop()
+        edges.append((p1, p2))
 
-        g_edges = []
-        for e in edges:
-            g_edges.append(Edge(g_points[e[0]], g_points[e[1]]))
-        # g_edges = [Edge(g_points[0],g_points[1]), Edge(g_points[0], g_points[2]), Edge(g_points[1], g_points[2]), Edge(g_points[3], g_points[0]), Edge(g_points[3], g_points[1]), Edge(g_points[3], g_points[2])]
+    points = list(set(chain.from_iterable(edges))) # Flatten list of edges and take unique points
+    points.sort()
+
+    # print(edges)
+    # print(points)
+    scale = max(7, num_edges**(1/3)*4)
+    g_points = []
+    for p in points:
+        x = random.uniform(0,scale//2)+scale//4
+        y = random.uniform(0,scale//2)+scale//4
+        z = random.uniform(0,scale//2)+scale//4
+        g_points.append(Point(x,y,z))
+
+    g_edges = []
+    for e in edges:
+        g_edges.append(Edge(g_points[e[0]], g_points[e[1]]))
 
     fig = plt.figure()
-    ax = Axes3D(fig, xlim=(0,10), ylim=(0,10), zlim=(0,10))
+    ax = Axes3D(fig, xlim=(0, scale), ylim=(0, scale), zlim=(0, scale))
     lines = sum([ax.plot([],[],[], lw=2) for e in g_edges], [])
 
     anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=150, interval=20, blit=True)
+                               frames=150, interval=20, blit=False)
     # anim.save('cube_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'], dpi=200)
     plt.show()
