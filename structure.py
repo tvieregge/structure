@@ -26,7 +26,6 @@ fig = plt.figure()
 ax = Axes3D(fig, xlim=(0,3), ylim=(0,3), zlim=(0,3))
 # lines = sum([ax.plot([], [], [], '-', c=c) for c in colors], [])
 lines = sum([ax.plot([],[],[], lw=2) for e in g_edges], [])
-print(lines)
 
 
 def init():
@@ -47,50 +46,16 @@ def animate(i):
     return lines
 
 
-# def start(fname):
-#     with open(fname) as f:
-#         content = f.readlines()
-#         edges = parse_points(content)
-
-#         points = [Point(1.0,1.0,1.0), Point(3.0,1.0,1.0), Point(1.5, 1.5, 1.0)]
-#         edges = [Edge(points[0],points[1]), Edge(points[0], points[2]), Edge(points[1], points[2])]
-
-#         fig = plt.figure()
-#         ax = fig.gca(projection='3d')
-
-#         for e in edges:
-#             ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2]+1, e.p2.l[2]+1])
-
-#         calc_forces(edges, points)
-#         apply_forces(points)
-
-#         for e in edges:
-#             ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2], e.p2.l[2]])
-
-#         calc_forces(edges, points)
-#         apply_forces(points)
-
-#         for e in edges:
-#             ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2]+2, e.p2.l[2]+2])
-
-#         calc_forces(edges, points)
-#         apply_forces(points)
-
-#         for e in edges:
-#             ax.plot([e.p1.l[0], e.p2.l[0]], [e.p1.l[1], e.p2.l[1]], [e.p1.l[2]+3, e.p2.l[2]+3])
-
-#         plt.show()
-
-
 def calc_forces(edges, points):
     for p in points:
+        p.force = np.array([0.0,0.0,0.0])
         for other_p in points:
             if p == other_p:
                 continue
-            p.force = calc_repulsion(p, other_p)
+            p.force += calc_repulsion(p, other_p)
 
     for e in edges:
-        attraction = calc_attraction(e)
+        attraction = 0.5*calc_attraction(e)
         e.p1.force -= attraction
         e.p2.force += attraction
 
